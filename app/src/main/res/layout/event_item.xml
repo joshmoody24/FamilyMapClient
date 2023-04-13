@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_centerVertical="true"
+        android:id="@+id/eventItemIcon"
+        android:layout_gravity="center"
+        android:padding="10sp"
+        android:src="@drawable/baseline_location_on_24" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@id/eventItemIcon">
+
+        <TextView
+            android:id="@+id/eventItemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Event Description" />
+
+        <TextView
+            android:id="@+id/eventItemOwner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Event Owner" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+</RelativeLayout>

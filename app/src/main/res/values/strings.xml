@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">Family Map</string>
+    <string name="serverHost">Server Host</string>
+    <string name="serverPort">Server Port</string>
+    <string name="firstName">First Name</string>
+    <string name="lastName">Last Name</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="gender">Gender</string>
+    <string name="signIn">Sign In</string>
+    <string name="register">Register</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="mapFragmentMessage">Click on a marker to view event details</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+
+    <string name="searchMenu">Search</string>
+    <string name="settingsMenu">Settings</string>
+
+    <!-- Preferences -->
+    <string name="life_story_lines_title">Life Story Lines</string>
+    <string name="life_story_lines">Show Life Story Lines</string>
+    <string name="family_tree_lines_title">Family Tree Lines</string>
+    <string name="family_tree_lines">Show Family Tree Lines</string>
+    <string name="spouse_lines_title">Spouse Lines</string>
+    <string name="spouse_lines">Show Spouse Lines</string>
+    <string name="father_side_title">Father\'s Side</string>
+    <string name="father_side">Filter by father\'s side of family</string>
+    <string name="mother_side_title">Mother\'s Side</string>
+    <string name="mother_side">Filter by mother\'s side of family</string>
+    <string name="male_events_title">Male Events</string>
+    <string name="male_events">Filter events based on gender</string>
+    <string name="female_events_title">Female Events</string>
+    <string name="female_events">Filter events based on gender</string>
+    <string name="logout_title">Logout</string>
+    <string name="logout">Return to login screen</string>
+
+
+    <string name="preference_file_key">com.example.familymapclient.PREFERENCE_FILE_KEY</string>
+
+</resources>
