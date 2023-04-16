@@ -74,7 +74,7 @@ public class DataCache {
     }
 
     // get first event for person with the matching event type
-    public List<Event> getEventForPersonChronologically(Person person) {
+    public List<Event> getEventsForPersonChronologically(Person person) {
         Set<Event> personEvents = getEventsForPerson(person);
         List<Event> sortedEvents = new ArrayList<>();
         sortedEvents.addAll(personEvents);
@@ -88,6 +88,28 @@ public class DataCache {
 
     public Set<Person> getMaternalAncestors(Person person) {
         return getSelfAndAncestors(people.get(person.getMotherID()));
+    }
+
+    // get parents and children
+    public List<Person> getFamilyMembers(Person person){
+        List<Person> family = new ArrayList<>();
+        if(person == null) return family;
+        if(person.getMotherID() != null) family.add(getPeople().get(person.getMotherID()));
+        if(person.getFatherID() != null) family.add(getPeople().get(person.getFatherID()));
+        if(person.getSpouseID() != null) family.add(getPeople().get(person.getSpouseID()));
+        for(Person p : getPeople().values()){
+            if(p.getFatherID() != null){
+                if(p.getFatherID().equals(person.getPersonID())){
+                    family.add(p);
+                }
+            }
+            if(p.getMotherID() != null){
+                if(p.getMotherID().equals(person.getPersonID())){
+                    family.add(p);
+                }
+            }
+        }
+        return family;
     }
 
     private Set<Person> getSelfAndAncestors(Person person){

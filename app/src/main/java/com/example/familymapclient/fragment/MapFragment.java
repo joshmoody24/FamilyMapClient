@@ -23,6 +23,8 @@ import com.example.familymapclient.activity.PersonActivity;
 import com.example.familymapclient.activity.SearchActivity;
 import com.example.familymapclient.activity.SettingsActivity;
 import com.example.familymapclient.data.DataCache;
+import com.example.familymapclient.data.RelationshipHelper;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -100,38 +102,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         float[] colors = {0, 180, 90, 270, 45, 225, 135, 315};
         int nextColorIndex = 0;
 
-        // load settings (not broken out into separate function for performance reasons)
-        // to use a custom preference file location, use this instead:
-        // SharedPreferences preferences = this.getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        boolean showMaleEvents = preferences.getBoolean("male_events", true);
-        boolean showFemaleEvents = preferences.getBoolean("female_events", true);
-        boolean showMotherSide = preferences.getBoolean("mother_side", true);
-        boolean showFatherSide = preferences.getBoolean("father_side", true);
-
         for(String eventId : cache.getEvents().keySet()){
 
             Event event = cache.getEvents().get(eventId);
             Person relatedPerson = cache.getPeople().get(event.getPersonID());
 
-            // filter events by preferences
-            Person user = cache.getPeople().get(cache.getPersonId());
             if(relatedPerson == null) continue; // silence errors (just in case, don't want it crashing on users)
-            if(!showMaleEvents && Character.toLowerCase(relatedPerson.getGender()) == 'm') continue;
-            if(!showFemaleEvents && Character.toLowerCase(relatedPerson.getGender()) == 'f') continue;
-            if(!showMotherSide && cache.getMaternalAncestors(user).contains(relatedPerson)) continue;
-            if(!showFatherSide && cache.getPaternalAncestors(user).contains(relatedPerson)) continue;
+            if(RelationshipHelper.isEventFiltered(event, getContext())) continue;
 
             LatLng location = new LatLng(event.getLatitude(), event.getLongitude());
 
             // dynamically assign colors to each event type
             float color;
-            if(eventTypeColors.containsKey(event.getEventType())){
-                color = eventTypeColors.get(event.getEventType());
+            if(eventTypeColors.containsKey(event.getEventType().toLowerCase())){
+                color = eventTypeColors.get(event.getEventType().toLowerCase());
             }
             else{
                 color = colors[nextColorIndex];
-                eventTypeColors.put(event.getEventType(), colors[nextColorIndex]);
+                eventTypeColors.put(event.getEventType().toLowerCase(), colors[nextColorIndex]);
                 nextColorIndex++;
                 if(nextColorIndex >= colors.length) nextColorIndex = 0;
             }
@@ -159,11 +147,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 Person spouse = cache.getPeople().get(person.getSpouseID());
                 Event birth = cache.getEventForPerson(spouse, "birth");
                 if(birth == null) birth = cache.getEarliestEventForPerson(spouse);
-                map.addPolyline(new PolylineOptions()
-                        .add(new LatLng(event.getLatitude(), event.getLongitude()))
-                        .add(new LatLng(birth.getLatitude(), birth.getLongitude()))
-                        .color(Color.BLUE)
-                );
+                if(!RelationshipHelper.isEventFiltered(birth, getContext())){
+                    map.addPolyline(new PolylineOptions()
+                            .add(new LatLng(event.getLatitude(), event.getLongitude()))
+                            .add(new LatLng(birth.getLatitude(), birth.getLongitude()))
+                            .color(Color.BLUE)
+                    );
+                }
             }
         }
 
@@ -177,7 +167,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         // draw lines to events in chronological order
         if(showLifeStoryLines){
             Event previousEvent = null;
-            for(Event e : cache.getEventForPersonChronologically(person)){
+            for(Event e : cache.getEventsForPersonChronologically(person)){
                 if(previousEvent == null){
                     previousEvent = e;
                     continue;
@@ -212,12 +202,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         Event birth = cache.getEventForPerson(parent, "birth");
         if(birth == null) birth = cache.getEarliestEventForPerson(parent);
-        map.addPolyline(new PolylineOptions()
-                .add(new LatLng(event.getLatitude(), event.getLongitude()))
-                .add(new LatLng(birth.getLatitude(), birth.getLongitude()))
-                .color(Color.YELLOW)
-                .width(lineWidth)
-        );
+        if(!RelationshipHelper.isEventFiltered(birth, getContext())) {
+            map.addPolyline(new PolylineOptions()
+                    .add(new LatLng(event.getLatitude(), event.getLongitude()))
+                    .add(new LatLng(birth.getLatitude(), birth.getLongitude()))
+                    .color(Color.YELLOW)
+                    .width(lineWidth)
+            );
+        }
 
         Person grandmother = cache.getPeople().get(parent.getMotherID());
         Person grandfather = cache.getPeople().get(parent.getFatherID());
@@ -237,6 +229,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         Event event = (Event)marker.getTag();
+        LatLng eventLocation = new LatLng(event.getLatitude(), event.getLongitude());
+        map.animateCamera(CameraUpdateFactory.newLatLng(eventLocation));
+
         Person person = DataCache.getInstance().getPeople().get(event.getPersonID());
         selectedPerson = person;
         eventInfo.setText(getEventDescription(event));

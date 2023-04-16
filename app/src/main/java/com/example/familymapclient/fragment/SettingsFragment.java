@@ -2,6 +2,7 @@ package com.example.familymapclient.fragment;
 
 import android.os.Bundle;
 
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import com.example.familymapclient.R;

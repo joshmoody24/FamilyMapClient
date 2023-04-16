@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.familymapclient.R;
 import com.example.familymapclient.data.DataCache;
+import com.example.familymapclient.data.RelationshipHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,15 +166,28 @@ public class SearchActivity extends AppCompatActivity {
                     || e.getCountry().toLowerCase().contains(query)
                     || e.getCity().toLowerCase().contains(query)
                     || e.getYear().toString().contains(query)
-            ) events.add(e);
+            ){
+                if(!RelationshipHelper.isEventFiltered(e, getApplicationContext())){
+                    events.add(e);
+                }
+            }
         }
 
         List<Person> people = new ArrayList<Person>();
         for(Person p : cache.getPeople().values()){
             String fullName = p.getFirstName() + " " + p.getLastName();
             if(fullName.toLowerCase().contains(query)){
-                people.add(p);
+                if(!RelationshipHelper.isPersonFiltered(p, getApplicationContext())){
+                    people.add(p);
+                };
             }
+        }
+
+        // as per the project spec, blank search results at first
+        // not the most efficient method but easiest to understand
+        if(query.equals("")){
+            people = new ArrayList<>();
+            events = new ArrayList<>();
         }
 
         SearchItemAdapter adapter = new SearchItemAdapter(events, people);

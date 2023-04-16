@@ -75,4 +75,14 @@
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"/>
 
+    <ExpandableListView
+        android:id="@+id/expandableListView"
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:dividerHeight="0.5dp"
+        android:divider="@android:color/darker_gray"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"/>
+
 </LinearLayout>
