@@ -49,6 +49,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private Person selectedPerson;
 
+    private boolean showMenu;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -86,6 +88,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         map.setOnMapLoadedCallback(this);
         drawEventMarkers();
         map.setOnMarkerClickListener(this);
+
+        // if the intent gave us an event id, center on that event
+        if(getActivity().getIntent().getExtras() != null){
+            String eventId = (String) getActivity().getIntent().getExtras().get("eventId");
+            Event event = DataCache.getInstance().getEvents().get(eventId);
+            LatLng eventLocation = new LatLng(event.getLatitude(), event.getLongitude());
+            map.animateCamera(CameraUpdateFactory.newLatLng(eventLocation));
+            selectEvent(event);
+        }
     }
 
     @Override
@@ -231,13 +242,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Event event = (Event)marker.getTag();
         LatLng eventLocation = new LatLng(event.getLatitude(), event.getLongitude());
         map.animateCamera(CameraUpdateFactory.newLatLng(eventLocation));
+        selectEvent(event);
+        return true;
+    }
 
+    private void selectEvent(Event event){
         Person person = DataCache.getInstance().getPeople().get(event.getPersonID());
         selectedPerson = person;
         eventInfo.setText(getEventDescription(event));
         setGenderIcon(person);
         drawLinesForEvent(event);
-        return true;
     }
 
     private String getEventDescription(Event event){
@@ -260,7 +274,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.main_menu, menu);
+        // if the intent includes any extras, we don't want to draw the menu
+        // because it is inside the EventActivity, not the MainActivity
+        if(getActivity().getIntent().getExtras() == null){
+            inflater.inflate(R.menu.main_menu, menu);
+        }
     }
 
     @Override
