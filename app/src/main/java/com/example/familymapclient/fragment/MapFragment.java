@@ -119,7 +119,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             Person relatedPerson = cache.getPeople().get(event.getPersonID());
 
             if(relatedPerson == null) continue; // silence errors (just in case, don't want it crashing on users)
-            if(RelationshipHelper.isEventFiltered(event, getContext())) continue;
+
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+            boolean showMaleEvents = preferences.getBoolean("male_events", true);
+            boolean showFemaleEvents = preferences.getBoolean("female_events", true);
+            boolean showMotherSide = preferences.getBoolean("mother_side", true);
+            boolean showFatherSide = preferences.getBoolean("father_side", true);
+
+
+            if(RelationshipHelper.isEventFiltered(event, showMaleEvents, showFemaleEvents, showMotherSide, showFatherSide)) continue;
 
             LatLng location = new LatLng(event.getLatitude(), event.getLongitude());
 
@@ -158,7 +166,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 Person spouse = cache.getPeople().get(person.getSpouseID());
                 Event birth = cache.getEventForPerson(spouse, "birth");
                 if(birth == null) birth = cache.getEarliestEventForPerson(spouse);
-                if(!RelationshipHelper.isEventFiltered(birth, getContext())){
+
+                boolean showMaleEvents = preferences.getBoolean("male_events", true);
+                boolean showFemaleEvents = preferences.getBoolean("female_events", true);
+                boolean showMotherSide = preferences.getBoolean("mother_side", true);
+                boolean showFatherSide = preferences.getBoolean("father_side", true);
+
+                if(!RelationshipHelper.isEventFiltered(birth, showMaleEvents, showFemaleEvents, showMotherSide, showFatherSide)){
                     map.addPolyline(new PolylineOptions()
                             .add(new LatLng(event.getLatitude(), event.getLongitude()))
                             .add(new LatLng(birth.getLatitude(), birth.getLongitude()))
@@ -213,7 +227,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         Event birth = cache.getEventForPerson(parent, "birth");
         if(birth == null) birth = cache.getEarliestEventForPerson(parent);
-        if(!RelationshipHelper.isEventFiltered(birth, getContext())) {
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        boolean showMaleEvents = preferences.getBoolean("male_events", true);
+        boolean showFemaleEvents = preferences.getBoolean("female_events", true);
+        boolean showMotherSide = preferences.getBoolean("mother_side", true);
+        boolean showFatherSide = preferences.getBoolean("father_side", true);
+
+        if(!RelationshipHelper.isEventFiltered(birth, showMaleEvents, showFemaleEvents, showMotherSide, showFatherSide)) {
             map.addPolyline(new PolylineOptions()
                     .add(new LatLng(event.getLatitude(), event.getLongitude()))
                     .add(new LatLng(birth.getLatitude(), birth.getLongitude()))

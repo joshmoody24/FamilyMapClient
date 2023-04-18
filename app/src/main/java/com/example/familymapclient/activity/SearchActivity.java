@@ -2,10 +2,12 @@ package com.example.familymapclient.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import com.example.familymapclient.R;
 import com.example.familymapclient.data.DataCache;
 import com.example.familymapclient.data.RelationshipHelper;
+import com.example.familymapclient.data.SearchHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,13 +164,13 @@ public class SearchActivity extends AppCompatActivity {
 
         List<Event> events = new ArrayList<Event>();
         for(Event e : cache.getEvents().values()){
-            if(
-                    e.getEventType().toLowerCase().contains(query)
-                    || e.getCountry().toLowerCase().contains(query)
-                    || e.getCity().toLowerCase().contains(query)
-                    || e.getYear().toString().contains(query)
-            ){
-                if(!RelationshipHelper.isEventFiltered(e, getApplicationContext())){
+            if(SearchHelper.eventMatchesQuery(e, query)){
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                boolean showMaleEvents = preferences.getBoolean("male_events", true);
+                boolean showFemaleEvents = preferences.getBoolean("female_events", true);
+                boolean showMotherSide = preferences.getBoolean("mother_side", true);
+                boolean showFatherSide = preferences.getBoolean("father_side", true);
+                if(!RelationshipHelper.isEventFiltered(e, showMaleEvents, showFemaleEvents, showMotherSide, showFatherSide)){
                     events.add(e);
                 }
             }
@@ -175,11 +178,8 @@ public class SearchActivity extends AppCompatActivity {
 
         List<Person> people = new ArrayList<Person>();
         for(Person p : cache.getPeople().values()){
-            String fullName = p.getFirstName() + " " + p.getLastName();
-            if(fullName.toLowerCase().contains(query)){
-                if(!RelationshipHelper.isPersonFiltered(p, getApplicationContext())){
-                    people.add(p);
-                };
+            if(SearchHelper.personMatchesQuery(p, query)){
+                people.add(p);
             }
         }
 

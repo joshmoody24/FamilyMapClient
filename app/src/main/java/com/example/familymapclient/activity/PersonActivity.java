@@ -1,8 +1,10 @@
 package com.example.familymapclient.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,15 +47,22 @@ public class PersonActivity extends AppCompatActivity {
 
         ExpandableListView expandableListView = findViewById(R.id.expandableListView);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean showMaleEvents = preferences.getBoolean("male_events", true);
+        boolean showFemaleEvents = preferences.getBoolean("female_events", true);
+        boolean showMotherSide = preferences.getBoolean("mother_side", true);
+        boolean showFatherSide = preferences.getBoolean("father_side", true);
+
+
         DataCache cache = DataCache.getInstance();
         List<Event> events = RelationshipHelper.filterEvents(
                 cache.getEventsForPersonChronologically(person),
-                getApplicationContext()
+                showMaleEvents,
+                showFemaleEvents,
+                showMotherSide,
+                showFatherSide
         );
-        List<Person> people = RelationshipHelper.filterPeople(
-                cache.getFamilyMembers(person),
-                getApplicationContext()
-        );
+        List<Person> people = cache.getFamilyMembers(person);
 
         expandableListView.setAdapter(new ExpandableListAdapter(events, people));
     }
